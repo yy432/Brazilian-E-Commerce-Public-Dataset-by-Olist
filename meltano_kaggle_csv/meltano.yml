@@ -1,0 +1,73 @@
+version: 1
+default_environment: dev
+project_id: 1eaef689-0fbc-4a8e-9a03-fbdb107e84ad
+
+environments:
+- name: dev
+- name: staging
+- name: prod
+
+plugins:
+  extractors:
+  - name: tap-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+    config:
+      files:
+      - entity: olist_customers
+        path: data/olist_customers_dataset.csv
+        keys: [customer_id]
+
+      - entity: olist_order_items
+        path: data/olist_order_items_dataset.csv
+        keys: [order_id, order_item_id]
+
+      - entity: olist_order_payments
+        path: data/olist_order_payments_dataset.csv
+        keys: [order_id, payment_sequential]
+
+      - entity: olist_order_reviews
+        path: data/olist_order_reviews_dataset.csv
+        keys: [review_id]
+
+      - entity: olist_orders
+        path: data/olist_orders_dataset.csv
+        keys: [order_id]
+
+      - entity: olist_products
+        path: data/olist_products_dataset.csv
+        keys: [product_id]
+
+      - entity: olist_sellers
+        path: data/olist_sellers_dataset.csv
+        keys: [seller_id]
+
+      - entity: olist_geolocation
+        path: data/olist_geolocation_dataset.csv
+        keys: [geolocation_zip_code_prefix]
+
+      - entity: product_category_name_translation
+        path: data/product_category_name_translation.csv
+        keys: [product_category_name]
+
+    select:
+    - '*.*'
+  loaders:
+  - name: target-bigquery
+    variant: z3z1ma
+    pip_url: git+https://github.com/z3z1ma/target-bigquery.git
+    config:
+      project: durable-ripsaw-477914-g0
+      dataset: ecommerce
+      location: US
+      method: batch_job
+      credentials_path: /home/pingh/project 
+        2/durable-ripsaw-477914-g0-206ef3866e00.json
+      denormalized: true
+      flattening_enabled: true
+      flattening_max_depth: 1
+      upsert: false
+      overwrite: false
+      dedupe_before_upsert: false
+
+
