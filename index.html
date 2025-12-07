@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google Identity Services (OAuth) -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+
   <meta charset="UTF-8" />
   <title>Brazilian E-Commerce Analytics – BigQuery Live Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Google API JS (for BigQuery) -->
+  <!-- Google API JS (BigQuery) -->
   <script src="https://apis.google.com/js/api.js"></script>
-  <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer"></script>
 
   <!-- Plotly -->
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
@@ -611,9 +611,8 @@
     const API_KEY    = "AIzaSyDb4uWxi5LWSQXzFvf87cJtonj6zMzNCks";
     const PROJECT_ID = "durable-ripsaw-477914-g0";
 
-    // NEW: use separate datasets
-    const DIM_DATASET  = "ecommerce_dim";   // all dim_db_* tables
-    const FACT_DATASET = "ecommerce_fact";  // fact_db_order_items
+    const DIM_DATASET  = "ecommerce_dim";
+    const FACT_DATASET = "ecommerce_fact";
 
     const SCOPES = "https://www.googleapis.com/auth/bigquery.readonly";
 
@@ -625,8 +624,8 @@
     let tokenClient;
     let gapiInited = false;
     let gisInited = false;
-    let selectedYear = "ALL";          // All / 2016 / 2017 / 2018
-    let currentTab = "customers";      // customers / sellers / orders
+    let selectedYear = "ALL";
+    let currentTab = "customers";
 
     function setStatus(text, isError = false) {
       const el = document.getElementById("status");
@@ -677,7 +676,7 @@
       const r = rows[0];
       document.getElementById("kpi-cust-count").textContent   = Number(val(r,0)).toLocaleString("en-US");
       document.getElementById("kpi-cust-orders").textContent  = Number(val(r,1)).toLocaleString("en-US");
-      document.getElementById("kpi-cust-states").textContent  = "27"; // Brazil states
+      document.getElementById("kpi-cust-states").textContent  = "27";
       document.getElementById("kpi-cust-revenue").textContent = "R$ " + Number(val(r,3)).toLocaleString("en-US", {maximumFractionDigits:0});
     }
 
@@ -1139,7 +1138,7 @@
       ]);
     }
 
-    /********** 7. ORDER CHARTS (with >2 filter) **********/
+    /********** 7. ORDER CHARTS **********/
     async function chartOrdersTopCategories() {
       const sql = `
         WITH base AS (
@@ -1190,37 +1189,40 @@
           SELECT
             d.year,
             f.seller_id,
+            COALESCE(s.seller_name, f.seller_id) AS seller_label,
             COUNT(DISTINCT f.order_id) AS orders,
             SUM(f.gross_order_item_value) AS revenue
           FROM \`${PROJECT_ID}.${FACT_DATASET}.fact_db_order_items\` f
           JOIN \`${PROJECT_ID}.${DIM_DATASET}.dim_db_dates\` d
             ON f.order_date_key = d.date_key
-          GROUP BY year, seller_id
+          LEFT JOIN \`${PROJECT_ID}.${DIM_DATASET}.dim_db_sellers\` s
+            ON f.seller_id = s.seller_id
+          GROUP BY year, seller_id, seller_label
         )
         SELECT
-          seller_id,
+          seller_label,
           SUM(revenue) AS revenue
         FROM base
         WHERE orders > 2
         ${selectedYear === "ALL" ? "" : "AND year = " + selectedYear}
-        GROUP BY seller_id
+        GROUP BY seller_label
         ORDER BY revenue DESC
-        LIMIT 20
+        LIMIT 15
       `;
       const rows = await runQuery(sql);
-      const ids = rows.map(r => (val(r,0) || "").substring(0, 8) + "…");
-      const revs = rows.map(r => Number(val(r,1)));
+      const labels = rows.map(r => val(r,0) || "Unknown");
+      const revs   = rows.map(r => Number(val(r,1)));
 
       Plotly.newPlot("orders-top-sellers", [{
         type: "bar",
         x: revs,
-        y: ids,
+        y: labels,
         orientation: "h",
-        hovertemplate: "Seller %{y}: R$ %{x:,.0f}<extra></extra>"
+        hovertemplate: "%{y}: R$ %{x:,.0f}<extra></extra>"
       }], {
         paper_bgcolor: "rgba(0,0,0,0)",
         plot_bgcolor: "rgba(0,0,0,0)",
-        margin: { t: 12, l: 80, r: 10, b: 30 },
+        margin: { t: 12, l: 120, r: 10, b: 30 },
         xaxis: { title: "Revenue (BRL, > 2 orders)", color: "#9ca3af", gridcolor: "#111827" },
         yaxis: { color: "#9ca3af" }
       }, {responsive: true});
@@ -1236,6 +1238,7 @@
         JOIN \`${PROJECT_ID}.${DIM_DATASET}.dim_db_dates\` d
           ON f.order_date_key = d.date_key
         GROUP BY year, year_month
+        HAVING COUNT(DISTINCT f.order_id) > 1
         ORDER BY year_month
       `;
       const rows = await runQuery(sql);
@@ -1324,6 +1327,14 @@
       } else {
         setStatus("Failed to load Google API JS.", true);
       }
+
+      // Wait for GIS script to be ready
+      const gisInterval = setInterval(() => {
+        if (window.google && google.accounts && google.accounts.oauth2) {
+          clearInterval(gisInterval);
+          if (!gisInited) gisLoaded();
+        }
+      }, 200);
 
       const signInBtn  = document.getElementById("signin-button");
       const signOutBtn = document.getElementById("signout-button");
@@ -1420,5 +1431,3 @@
   </script>
 </body>
 </html>
-
-
