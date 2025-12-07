@@ -4,7 +4,8 @@
 
 Live interactive dashboard:  
 👉 **https://pinghar.github.io/Brazilian-E-Commerce-Public-Dataset-by-Olist/**
-
+Presentation slide
+https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL2IvYy9jZmQ3Y2U3Nzg1MmMzNDA0L0lRQUJKRjZ0cEJpYlI3UlhMOWlSRkk2bUFaS3ozMWY2UzByLVNaY0k3S3BONmNZP2U9WFVuN1VI&cid=CFD7CE77852C3404&id=CFD7CE77852C3404%21sad5e240118a4479bb4572fd891148ea6&parId=CFD7CE77852C3404%21s125e47f6609c4140ba0827ee87ac0566&o=OneUp
 ---
 
 ## 1. Architecture Overview
