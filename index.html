@@ -1189,7 +1189,7 @@
           SELECT
             d.year,
             f.seller_id,
-            COALESCE(s.seller_name, f.seller_id) AS seller_label,
+            COALESCE(s.seller_id, f.seller_id) AS seller_label,
             COUNT(DISTINCT f.order_id) AS orders,
             SUM(f.gross_order_item_value) AS revenue
           FROM \`${PROJECT_ID}.${FACT_DATASET}.fact_db_order_items\` f
@@ -1431,3 +1431,4 @@
   </script>
 </body>
 </html>
+
