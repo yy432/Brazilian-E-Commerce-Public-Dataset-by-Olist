@@ -611,8 +611,8 @@
     const API_KEY    = "AIzaSyDb4uWxi5LWSQXzFvf87cJtonj6zMzNCks";
     const PROJECT_ID = "durable-ripsaw-477914-g0";
 
-    const DIM_DATASET  = "ecommerce_dim";
-    const FACT_DATASET = "ecommerce_fact";
+    const DIM_DATASET  = "ecommerce";
+    const FACT_DATASET = "ecommerce";
 
     const SCOPES = "https://www.googleapis.com/auth/bigquery.readonly";
 
@@ -1183,20 +1183,19 @@
       }, {responsive: true});
     }
 
+    /* FIXED: use anonymised seller label; no seller_name column */
     async function chartOrdersTopSellers() {
       const sql = `
         WITH base AS (
           SELECT
             d.year,
             f.seller_id,
-            COALESCE(s.seller_id, f.seller_id) AS seller_label,
+            CONCAT('Seller ', SUBSTR(f.seller_id, 1, 8)) AS seller_label,
             COUNT(DISTINCT f.order_id) AS orders,
             SUM(f.gross_order_item_value) AS revenue
           FROM \`${PROJECT_ID}.${FACT_DATASET}.fact_db_order_items\` f
           JOIN \`${PROJECT_ID}.${DIM_DATASET}.dim_db_dates\` d
             ON f.order_date_key = d.date_key
-          LEFT JOIN \`${PROJECT_ID}.${DIM_DATASET}.dim_db_sellers\` s
-            ON f.seller_id = s.seller_id
           GROUP BY year, seller_id, seller_label
         )
         SELECT
@@ -1328,7 +1327,7 @@
         setStatus("Failed to load Google API JS.", true);
       }
 
-      // Wait for GIS script to be ready
+      // Poll until GIS is loaded
       const gisInterval = setInterval(() => {
         if (window.google && google.accounts && google.accounts.oauth2) {
           clearInterval(gisInterval);
@@ -1431,4 +1430,3 @@
   </script>
 </body>
 </html>
-
