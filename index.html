@@ -684,6 +684,48 @@
       "https://bigquery.googleapis.com/$discovery/rest?version=v2"
     ];
 
+    // unified chart colour palette
+    const CHART_COLORS = {
+      line: "#22c55e",
+      barPrimary: "#38bdf8",
+      barSecondary: "#0ea5e9",
+      barMuted: "#64748b",
+      revenue: "#22c55e",
+      category: "#0ea5e9",
+      pie: ["#22c55e", "#38bdf8", "#0ea5e9", "#f97316", "#eab308", "#a855f7", "#ec4899", "#06b6d4"]
+    };
+
+    // helper to build dark layout for Plotly
+    function darkLayout(extra) {
+      const base = {
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: "#020617",
+        font: { color: "#e5e7eb", size: 11 },
+        xaxis: {
+          titlefont: { color: "#9ca3af" },
+          tickfont: { color: "#9ca3af" },
+          gridcolor: "#111827",
+          zerolinecolor: "#111827"
+        },
+        yaxis: {
+          titlefont: { color: "#9ca3af" },
+          tickfont: { color: "#9ca3af" },
+          gridcolor: "#111827",
+          zerolinecolor: "#111827"
+        },
+        legend: { font: { color: "#9ca3af" } }
+      };
+
+      const out = extra ? {...extra} : {};
+      if (extra && extra.xaxis) {
+        out.xaxis = Object.assign({}, base.xaxis, extra.xaxis);
+      }
+      if (extra && extra.yaxis) {
+        out.yaxis = Object.assign({}, base.yaxis, extra.yaxis);
+      }
+      return Object.assign(base, out);
+    }
+
     // Rough coordinates for Brazilian states (centre of each state)
     const BRAZIL_STATE_COORDS = {
       "AC": { lat: -9.11,     lon: -70.52 },
@@ -833,14 +875,13 @@
         mode: "lines+markers",
         x: years,
         y: counts,
-        line: { shape: "linear", width: 3, color: "#22c55e" },
-        marker: { size: 6 },
-        hovertemplate: "Year %{x}<br>Customers: %{y}<extra></extra>"
-      }], {
+        line: { shape: "linear", width: 3, color: CHART_COLORS.line },
+        marker: { size: 6 }
+      }], darkLayout({
         margin: { t: 18, l: 40, r: 10, b: 32 },
         xaxis: { title: "Year" },
         yaxis: { title: "Distinct customers" }
-      }, { responsive: true });
+      }), { responsive: true });
     }
 
     async function chartCustomerRevenueByState() {
@@ -866,11 +907,11 @@
         labels,
         values,
         hole: 0.45,
-        hovertemplate: "%{label}<br>R$ %{value:,.0f}<extra></extra>"
-      }], {
+        marker: { colors: CHART_COLORS.pie }
+      }], darkLayout({
         margin: { t: 18, l: 10, r: 10, b: 10 },
         legend: { orientation: "h", y: -0.1 }
-      }, { responsive: true });
+      }), { responsive: true });
     }
 
     async function chartCustomerTopStates() {
@@ -897,13 +938,12 @@
         type: "bar",
         x: states,
         y: counts,
-        marker: { color: "#38bdf8" },
-        hovertemplate: "State %{x}<br>Customers: %{y}<extra></extra>"
-      }], {
+        marker: { color: CHART_COLORS.barPrimary }
+      }], darkLayout({
         margin: { t: 18, l: 40, r: 10, b: 32 },
         xaxis: { title: "State" },
         yaxis: { title: "Customers" }
-      }, { responsive: true });
+      }), { responsive: true });
 
       // make bars clickable to update state panel
       const chartDiv = document.getElementById(divId);
@@ -942,13 +982,12 @@
         type: "bar",
         x: states,
         y: counts,
-        marker: { color: "#64748b" },
-        hovertemplate: "State %{x}<br>Customers: %{y}<extra></extra>"
-      }], {
+        marker: { color: CHART_COLORS.barMuted }
+      }], darkLayout({
         margin: { t: 18, l: 40, r: 10, b: 32 },
         xaxis: { title: "State" },
         yaxis: { title: "Customers" }
-      }, { responsive: true });
+      }), { responsive: true });
     }
 
     async function chartCustomerMap() {
@@ -1006,15 +1045,15 @@
           ],
           reversescale: false,
           line: { color: "#e5e7eb", width: 0.7 }
-        },
-        hovertemplate: "%{text}<extra></extra>"
+        }
       }], {
+        paper_bgcolor: "rgba(0,0,0,0)",
+        plot_bgcolor: "#020617",
         margin: { t: 0, l: 0, r: 0, b: 0 },
         geo: {
           scope: "south america",
           projection: { type: "mercator" },
           center: { lat: -14, lon: -52 },
-          // focus region tighter around Brazil
           lonaxis: { range: [-75, -32] },
           lataxis: { range: [5, -35] },
           showland: true,
@@ -1031,7 +1070,6 @@
       const mapDiv = document.getElementById(divId);
       mapDiv.on("plotly_click", (data) => {
         if (!data || !data.points || !data.points.length) return;
-        // We stored states in the same order as points
         const pointIndex = data.points[0].pointIndex;
         const stateCode  = states[pointIndex];
         setStatus(`Filtering detail panel for state ${stateCode}…`);
@@ -1110,11 +1148,11 @@
         labels: years,
         values: freight,
         hole: 0.5,
-        hovertemplate: "Year %{label}<br>Freight R$ %{value:,.0f}<extra></extra>"
-      }], {
+        marker: { colors: CHART_COLORS.pie }
+      }], darkLayout({
         margin: { t: 18, l: 10, r: 10, b: 10 },
         legend: { orientation: "h", y: -0.1 }
-      }, { responsive: true });
+      }), { responsive: true });
     }
 
     async function chartSellerRevenueByYear() {
@@ -1140,14 +1178,13 @@
         mode: "lines+markers",
         x: years,
         y: revenue,
-        line: { color: "#22c55e", width: 3 },
-        marker: { size: 6 },
-        hovertemplate: "Year %{x}<br>Revenue R$ %{y:,.0f}<extra></extra>"
-      }], {
+        line: { color: CHART_COLORS.revenue, width: 3 },
+        marker: { size: 6 }
+      }], darkLayout({
         margin: { t: 18, l: 60, r: 10, b: 32 },
         xaxis: { title: "Year" },
         yaxis: { title: "Revenue (BRL)" }
-      }, { responsive: true });
+      }), { responsive: true });
     }
 
     async function chartSellerTopStates() {
@@ -1172,12 +1209,11 @@
         x: counts,
         y: states,
         orientation: "h",
-        marker: { color: "#38bdf8" },
-        hovertemplate: "State %{y}<br>Sellers: %{x}<extra></extra>"
-      }], {
+        marker: { color: CHART_COLORS.barPrimary }
+      }], darkLayout({
         margin: { t: 18, l: 60, r: 10, b: 26 },
         xaxis: { title: "Number of sellers" }
-      }, { responsive: true });
+      }), { responsive: true });
     }
 
     async function chartSellerBottomStates() {
@@ -1203,12 +1239,11 @@
         x: counts,
         y: states,
         orientation: "h",
-        marker: { color: "#64748b" },
-        hovertemplate: "State %{y}<br>Sellers: %{x}<extra></extra>"
-      }], {
+        marker: { color: CHART_COLORS.barMuted }
+      }], darkLayout({
         margin: { t: 18, l: 60, r: 10, b: 26 },
         xaxis: { title: "Number of sellers" }
-      }, { responsive: true });
+      }), { responsive: true });
     }
 
     async function chartSellerProductTypes() {
@@ -1235,11 +1270,11 @@
         x: items,
         y: names,
         orientation: "h",
-        hovertemplate: "%{y}<br>Items: %{x}<extra></extra>"
-      }], {
+        marker: { color: CHART_COLORS.barSecondary }
+      }], darkLayout({
         margin: { t: 18, l: 150, r: 10, b: 26 },
         xaxis: { title: "Order items" }
-      }, { responsive: true });
+      }), { responsive: true });
     }
 
     /********** 7. ORDER CHARTS & CATEGORY DETAIL **********/
@@ -1266,14 +1301,13 @@
         mode: "lines+markers",
         x: years,
         y: revenue,
-        line: { color: "#22c55e", width: 3 },
-        marker: { size: 6 },
-        hovertemplate: "Year %{x}<br>Revenue R$ %{y:,.0f}<extra></extra>"
-      }], {
+        line: { color: CHART_COLORS.revenue, width: 3 },
+        marker: { size: 6 }
+      }], darkLayout({
         margin: { t: 18, l: 60, r: 10, b: 32 },
         xaxis: { title: "Year" },
         yaxis: { title: "Revenue (BRL)" }
-      }, { responsive: true });
+      }), { responsive: true });
     }
 
     async function chartOrderCategoryRevenue() {
@@ -1303,12 +1337,11 @@
         x: revenue,
         y: categories,
         orientation: "h",
-        marker: { color: "#f97316" },
-        hovertemplate: "%{y}<br>R$ %{x:,.0f}<extra></extra>"
-      }], {
+        marker: { color: CHART_COLORS.category }
+      }], darkLayout({
         margin: { t: 18, l: 150, r: 10, b: 26 },
         xaxis: { title: "Revenue (BRL)" }
-      }, { responsive: true });
+      }), { responsive: true });
 
       // click to show category detail
       const chartDiv = document.getElementById(divId);
@@ -1421,14 +1454,13 @@
         mode: "lines+markers",
         x: ym,
         y: counts,
-        line: { color: "#38bdf8", width: 2 },
-        marker: { size: 5 },
-        hovertemplate: "%{x}<br>Orders: %{y}<extra></extra>"
-      }], {
+        line: { color: CHART_COLORS.barSecondary, width: 2 },
+        marker: { size: 5 }
+      }], darkLayout({
         margin: { t: 18, l: 60, r: 10, b: 60 },
         xaxis: { title: "Year-Month", tickangle: -35 },
         yaxis: { title: "Distinct orders" }
-      }, { responsive: true });
+      }), { responsive: true });
     }
 
     async function chartTopSellersByRevenue() {
@@ -1454,12 +1486,11 @@
         x: revenue,
         y: sellers,
         orientation: "h",
-        marker: { color: "#22c55e" },
-        hovertemplate: "Seller %{y}<br>R$ %{x:,.0f}<extra></extra>"
-      }], {
+        marker: { color: CHART_COLORS.line }
+      }], darkLayout({
         margin: { t: 18, l: 80, r: 10, b: 26 },
         xaxis: { title: "Revenue (BRL)" }
-      }, { responsive: true });
+      }), { responsive: true });
     }
 
     /********** 8. RENDER ALL **********/
