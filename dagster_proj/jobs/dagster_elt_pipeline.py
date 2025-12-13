@@ -5,7 +5,7 @@ import os
 import subprocess
 # --- 1. Define Operations (The Tasks) ---
 
-@op(name="Meltano_Extract_and_Load")
+@op(name="Meltano_E_and_L")
 def run_meltano_elt(context: OpExecutionContext) -> str:
     context.log.info("🚀 [Meltano] Starting extraction from Kaggle...")
     
@@ -28,7 +28,7 @@ def run_meltano_elt(context: OpExecutionContext) -> str:
     context.log.info("✅ [Meltano] Data loaded into BigQuery staging_tables.")
     return "staging_tables_ready"
 
-@op(name="DBT_STG_Run", ins={"start_signal": In(Nothing)})
+@op(name="DBT_STG_Build", ins={"start_signal": In(Nothing)})
 def run_dbt_stg_models(context: OpExecutionContext):
 
     context.log.info("🛠️ [dbt] Building staging models...")
@@ -67,7 +67,7 @@ def run_dbt_stg_tests(context: OpExecutionContext) -> str:
     return "staging_tests_complete"
 
 
-@op(name="DBT_Transformation", ins={"start_signal": In(Nothing)})
+@op(name="DBT_TFM_Build", ins={"start_signal": In(Nothing)})
 def run_dbt_dim_fact_models(context: OpExecutionContext) -> str:
 
     #context.log.info(f"Trigger received: {start_signal}")
@@ -99,7 +99,7 @@ def run_dbt_dim_fact_models(context: OpExecutionContext) -> str:
     context.log.info("✅ [dbt] Dim & Fact models built successfully.")
     return "dim_fact_tests_complete"
 
-@op(name="DBT_Transformation_Test", ins={"start_signal": In(Nothing)})
+@op(name="DBT_TFM_Test", ins={"start_signal": In(Nothing)})
 def run_dbt_dim_fact_tests(context: OpExecutionContext) -> str:
 
     #context.log.info(f"Trigger received: {start_signal}")
@@ -165,7 +165,7 @@ def run_gx_validation(context: OpExecutionContext):
     context.log.info("✅ [GX] Data quality validation passed.")
     return "gx_success"
 
-@op(name="EDA_ML_Analysis_Report",  ins={"start_signal": In(Nothing)})
+@op(name="EDA_ML_Analysis",  ins={"start_signal": In(Nothing)})
 def generate_eda_report(context: OpExecutionContext):
     """Simulates generating an EDA report."""
     context.log.info("📊 [EDA] Analyzing data distributions...")

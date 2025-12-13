@@ -464,6 +464,39 @@ y_pred_xgb = xgb_model.predict(X_test)
 xgb_metrics = evaluate_model("XGBoost Regressor", y_test, y_pred_xgb)
 
 # %%
+#Auto Launch dashboard html report
+import subprocess, platform, os
 
+# --- Configuration ---
+URL = "https://pinghar.github.io/Brazilian-E-Commerce-Public-Dataset-by-Olist/"
+
+def open_url(url):
+    system = platform.system()
+    is_wsl = False
+    
+    # lightweight WSL detection
+    if system == "Linux" and os.path.exists("/proc/version"):
+        with open("/proc/version", "r") as f:
+            if "microsoft" in f.read().lower(): is_wsl = True
+
+    # Select command based on OS
+    if system == "Darwin":                       # macOS
+        cmd = ["open", url]
+    elif system == "Windows" or is_wsl:          # Windows or WSL
+        cmd = ["cmd.exe", "/c", "start", "", url]
+    elif system == "Linux":                      # Native Linux
+        cmd = ["xdg-open", url]
+    else:
+        print(f"⚠️  Unknown OS. Open link manually: {url}"); return
+
+    # Execute
+    try:
+        # stdout/stderr suppressed to keep terminal clean
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        print(f"✅ Browser launched: {url}")
+    except Exception:
+        print(f"❌ Failed to launch browser. Please visit: {url}")
+
+open_url(URL)
 
 
