@@ -88,6 +88,7 @@ GX/uncommitted/<br>
 ```cd ~/Brazilian-E-Commerce-Public-Dataset-by-Olist```
 
 ### 2. install dagster into your existing eltn env
+```conda activate eltn```
 ```conda env update -f eltn_environment.yml```
 
 ### 3. ensure all *.py files executable
