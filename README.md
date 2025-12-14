@@ -36,47 +36,47 @@ GOOGLE_APPLICATION_CREDENTIALS="/full/path/to/your-service-account.json"<br>
 WEB_CLIENT_ID="your_google_client_id"<br>
 
 ## 5. .gitignore
-.env
-*.json
-data/
-.meltano/
-__pycache__/
-.ipynb_checkpoints/
-GX/uncommitted/
+.env<br>
+*.json<br>
+data/<br>
+.meltano/<br>
+__pycache__/<br>
+.ipynb_checkpoints/<br>
+GX/uncommitted/<br>
 
 ## 6. Meltano – Extract & Load Into BigQuery
-python download_kaggle.py
-meltano run tap-csv target-bigquery
+```python download_kaggle.py```<br>
+```meltano run tap-csv target-bigquery```<br>
 
 ## 7. dbt – Staging, Star Schema & Tests
-cd ./Dbt_Final/
+```cd ./Dbt_Final/<br>```
 
 ### 1. Connection Check
-dbt debug
+```dbt debug```
 
 ### 2. Install Packages (First Time only)
-dbt deps
+```dbt deps```
 
 ### 3. Staging Layer
-dbt run  --select stg_db_*
-dbt test --select stg_db_*
+```dbt run  --select stg_db_*```<br>
+```dbt test --select stg_db_*```
 
 ### 4. Dimension Layer
-dbt run  --select dim_db_*
-dbt test --select dim_db_*
+```dbt run  --select dim_db_*```<br>
+```dbt test --select dim_db_*```
 
 ### 5. Fact Layer
-dbt run  --select fact_db_*
-dbt test --select fact_db_*
+```dbt run  --select fact_db_*```<br>
+```dbt test --select fact_db_*```
 
 ### 6. Or ALL-IN-ONE
-dbt build --full-refresh
+```dbt build --full-refresh```
 
 ## 8. Great Expectations
-python GX/GX_Validation_Report.py
+```python GX/GX_Validation_Report.py```
 
 ## 9. EDA & Machine Learning
-python EDA_ML/EDA_ML.py
+```python EDA_ML/EDA_ML.py```
 
 ## 10. Dashboard
 [View Live Dashboard](https://pinghar.github.io/Brazilian-E-Commerce-Public-Dataset-by-Olist/).
