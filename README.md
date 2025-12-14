@@ -28,7 +28,7 @@ Create environment:<br>
 ```conda env create -f eltn_environment.yml```<br>
 ```conda activate eltn```
 
-## 4. Configure .env
+## 4. Create .env
 KAGGLE_USERNAME="your_kaggle_username"<br>
 KAGGLE_KEY="your_kaggle_api_key"<br>
 GCP_PROJECT_ID="your_gcp_project_id"<br>
