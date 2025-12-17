@@ -106,4 +106,4 @@ This project includes a complete executive-ready presentation deck covering:
 - Key insights and recommendations
 
 📎 **Full Slide Deck (PDF):**  
-[Full_Presentation_Slide.pdf](https://onedrive.live.com/?cid=cfd7ce77852c3404&id=CFD7CE77852C3404!s5926236d6f8a4d328af97ad403265bf3&resid=CFD7CE77852C3404!s5926236d6f8a4d328af97ad403265bf3&ithint=file,pdf&e=dlgS8k&migratedtospo=true&redeem=aHR0cHM6Ly8xZHJ2Lm1zL2IvYy9jZmQ3Y2U3Nzg1MmMzNDA0L0lRQnRJeVpaaW04eVRZcjVldFFESmx2ekFabXlJTnd4bl92cEZtTVg0VEFlT1BNP2U9ZGxnUzhr)
+[Full_Presentation_Slide.pdf](https://github.com/pinghar/Brazilian-E-Commerce-Public-Dataset-by-Olist/blob/main/group_presentation/Olist_Data_Platform_Building_Strategic_Assets.pdf)
